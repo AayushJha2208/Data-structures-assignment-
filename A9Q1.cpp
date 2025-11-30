@@ -95,8 +95,6 @@ void Prim(vector<vector<pair<int,int>>>& graph, int n) {
     while(!pq.empty()) {
         int u = pq.top().second;
         pq.pop();
-
-        if(mst[u]) continue;
         mst[u] = true;
 
         if(parent[u] != -1) {
@@ -175,4 +173,5 @@ int main() {
 
     return 0;
 }
+
 
