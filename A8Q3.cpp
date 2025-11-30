@@ -14,7 +14,7 @@ struct Node {
 };
 
 void insertEl(Node*& root, int val){
-    if (root == nullptr){
+    if(root == nullptr){
         root = new Node(val);
         return;
     }
@@ -28,12 +28,6 @@ void insertEl(Node*& root, int val){
         insertEl(root->right, val);
     else
         insertEl(root->left, val);
-}
-
-Node* findMin(Node* root){
-    while(root->left != nullptr)
-        root = root->left;
-    return root;
 }
 
 Node* deleteEl(Node* root, int val){
@@ -55,9 +49,16 @@ Node* deleteEl(Node* root, int val){
             return temp;
         }
 
-        Node* temp = findMin(root->right);
-        root->data = temp->data;
-        root->right = deleteEl(root->right, temp->data);
+        Node* temp=root->right;
+        Node* pre=nullptr;
+        while(temp->left != nullptr){
+            pre = temp;
+            temp = temp->left;
+        }
+        root->data=temp->data;
+        if(!pre) root->right=temp->right;
+        else pre->left=temp->right;
+        delete temp;
     }
     return root;
 }
