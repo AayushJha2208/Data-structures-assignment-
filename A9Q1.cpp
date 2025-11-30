@@ -24,7 +24,7 @@ void BFS(int start, vector<vector<int>>& adj, int n) {
             }
         }
     }
-    cout << endl;
+    cout << endl << endl;
 }
 
 // ---------- DFS ----------
@@ -32,19 +32,18 @@ void DFSUtil(int node, vector<vector<int>>& adj, vector<bool>& visited) {
     visited[node] = true;
     cout << node << " ";
 
-    for(int neighbor : adj[node]) {
+    for(int neighbor : adj[node])
         if(!visited[neighbor]) DFSUtil(neighbor, adj, visited);
-    }
 }
 
 void DFS(int start, vector<vector<int>>& adj, int n) {
     vector<bool> visited(n, false);
     cout << "DFS Traversal: ";
     DFSUtil(start, adj, visited);
-    cout << endl;
+    cout << endl << endl;
 }
 
-// ---------- DSU for Kruskal ----------
+// ---------- DSU ----------
 struct Edge { int u, v, w; };
 
 int findParent(int v, vector<int>& parent) {
@@ -70,6 +69,7 @@ void Kruskal(vector<Edge>& edges, int n) {
 
     int cost = 0;
     cout << "Kruskal MST edges:\n";
+
     for(auto &e : edges) {
         if(findParent(e.u, parent) != findParent(e.v, parent)) {
             cost += e.w;
@@ -80,31 +80,36 @@ void Kruskal(vector<Edge>& edges, int n) {
     cout << "Total Cost: " << cost << endl << endl;
 }
 
-// ---------- Prim ----------
+// ---------- Prim (Updated Version) ----------
 void Prim(vector<vector<pair<int,int>>>& graph, int n) {
-    vector<int> key(n, INT_MAX);
+    vector<int> key(n, INT_MAX), parent(n, -1);
     vector<bool> mst(n, false);
     key[0] = 0;
 
     priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
-    pq.push({0,0});
+    pq.push({0, 0});
 
-    int cost = 0;
     cout << "Prim MST edges:\n";
+    int cost = 0;
 
     while(!pq.empty()) {
-        pair<int,int> top = pq.top(); pq.pop();
-        int u = top.second;
+        int u = pq.top().second;
+        pq.pop();
 
         if(mst[u]) continue;
         mst[u] = true;
-        cost += key[u];
+
+        if(parent[u] != -1) {
+            cout << parent[u] << " - " << u << " : " << key[u] << endl;
+            cost += key[u];
+        }
 
         for(auto &p : graph[u]) {
             int v = p.first, w = p.second;
             if(!mst[v] && w < key[v]) {
                 key[v] = w;
-                pq.push(make_pair(key[v], v));
+                parent[v] = u;
+                pq.push({key[v], v});
             }
         }
     }
@@ -120,61 +125,47 @@ void Dijkstra(vector<vector<pair<int,int>>>& graph, int n, int start) {
     pq.push({0,start});
 
     while(!pq.empty()) {
-        pair<int,int> top = pq.top(); pq.pop();
+        auto top = pq.top(); pq.pop();
         int u = top.second;
 
         for(auto &p : graph[u]) {
             int v = p.first, w = p.second;
-
-            if(dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+            if(dist[u] + w < dist[v]) {
                 dist[v] = dist[u] + w;
-                pq.push(make_pair(dist[v], v));
+                pq.push({dist[v], v});
             }
         }
     }
 
     cout << "Dijkstra Distances:\n";
-    for(int i = 0; i < n; i++)
+    for(int i=0; i<n; i++)
         cout << "Node " << i << " -> " << dist[i] << endl;
     cout << endl;
 }
 
-// ---------- MAIN DRIVER ----------
+// ---------- MAIN ----------
 int main() {
-    int n = 6;   
-    int e = 8;   
+    int n = 6;
 
     vector<vector<int>> adj(n);
     vector<vector<pair<int,int>>> graph(n);
     vector<Edge> edges;
 
-    cout << "\nEdges (u v weight):\n";
-
-    while(edges.size() < e) {
-        int u = rand() % n;
-        int v = rand() % n;
-        int w = (rand() % 20) + 1;  
-
-        if(u == v) continue; 
-        bool exists = false;
-        for(auto &ed : edges) {
-            if((ed.u == u && ed.v == v) || (ed.u == v && ed.v == u)) {
-                exists = true; break;
-            }
-        }
-        if(exists) continue;
-
+    auto addEdge = [&](int u, int v, int w){
         adj[u].push_back(v);
         adj[v].push_back(u);
+        graph[u].push_back({v,w});
+        graph[v].push_back({u,w});
+        edges.push_back({u,v,w});
+    };
 
-        graph[u].push_back({v, w});
-        graph[v].push_back({u, w});
-
-        edges.push_back({u, v, w});
-        cout << u << " " << v << " " << w << endl;
-    }
-
-    cout << endl;
+    addEdge(0,1,4);
+    addEdge(0,2,3);
+    addEdge(1,2,1);
+    addEdge(1,3,2);
+    addEdge(2,3,4);
+    addEdge(3,4,2);
+    addEdge(4,5,6);
 
     BFS(0, adj, n);
     DFS(0, adj, n);
