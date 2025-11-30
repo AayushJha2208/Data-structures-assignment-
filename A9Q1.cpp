@@ -80,7 +80,7 @@ void Kruskal(vector<Edge>& edges, int n) {
     cout << "Total Cost: " << cost << endl << endl;
 }
 
-// ---------- Prim (Updated Version) ----------
+// ---------- Prim ----------
 void Prim(vector<vector<pair<int,int>>>& graph, int n) {
     vector<int> key(n, INT_MAX), parent(n, -1);
     vector<bool> mst(n, false);
@@ -175,3 +175,4 @@ int main() {
 
     return 0;
 }
+
